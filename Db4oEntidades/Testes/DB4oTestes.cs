@@ -28,6 +28,15 @@ namespace Db4oEntidades.Testes
             _idConvenio = new Guid(); //Valor defult do guid
         }
 
+        [TestFixtureTearDown]
+        public void TearDown()
+        {
+            IRepositorio repositorio = RepositorioDb4O.ObterInstanciaDoRepositorio(_idConvenio);
+            repositorio.Dispose();
+
+            System.IO.File.Delete(_idConvenio.ToString() + ".yap");
+        }
+
         [Test]
         public void Abrir_Fechar_Conexao_Com_Mesma_Instancia()
         {
@@ -82,16 +91,17 @@ namespace Db4oEntidades.Testes
 
             try
             {
-                for (var i = 0; i < 5000; i++)
+                for (var i = 1; i < 5000; i++)
                 {
-                    var preInscrito = new {NomeDoSegurado = "Nome de número " + i.ToString(CultureInfo.InvariantCulture),};
+                    var preInscrito = new {NomeDoSegurado = "Nome de número " + i.ToString()};
                     repositorio.Inserir(Tipo, preInscrito.ToExpando());
                 }
 
                 //Recuperar os registros
                 var todosRegistros = repositorio.Listar(Tipo);
 
-                Assert.AreEqual(5000, todosRegistros.Count);
+                Assert.GreaterOrEqual(todosRegistros.Count, 5000);
+                Assert.AreEqual((todosRegistros[978] as IDictionary<string, Object>)["NomeDoSegurado"], "Nome de número 978");
 
             }
             catch (Exception)
