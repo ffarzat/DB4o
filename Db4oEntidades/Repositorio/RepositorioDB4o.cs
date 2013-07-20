@@ -3,13 +3,8 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-
 using Db4objects.Db4o;
 using Db4objects.Db4o.Config;
-using Db4objects.Db4o.Ext;
-using Db4objects.Db4o.Query;
 using Db4oEntidades.Extensions;
 
 
@@ -55,7 +50,10 @@ namespace Db4oEntidades.Repositorio
         /// <returns></returns>
         public List<ExpandoObject> Listar(string entidade)
         {
-            throw new NotImplementedException();
+            var instanciaDoTipoParaFazerMapeamento = ObterAnonimoDe(entidade);
+            IObjectSet result = Context.Query(instanciaDoTipoParaFazerMapeamento.GetType());
+
+            return result.ToExpandoList();
         }
 
         /// <summary>
@@ -169,7 +167,7 @@ namespace Db4oEntidades.Repositorio
         /// </summary>
         /// <remarks>
         /// </remarks>
-        public const string Dbname = "{0}.yap";
+        private const string Dbname = "{0}.yap";
 
         /// <summary>
         /// Instância única do Repositório

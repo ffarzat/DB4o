@@ -51,5 +51,10 @@ namespace Db4oEntidades
         /// <param name="id">identificador da  Entidade</param>
         /// <returns>ExpandoObject representando a Entidade Excluída</returns>
         ExpandoObject Excluir(string entidade, Guid id);
+
+        /// <summary>
+        /// Obriga o Repositório a liberar os recursos
+        /// </summary>
+        void Dispose();
     }
 }

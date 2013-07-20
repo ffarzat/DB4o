@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Dynamic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -76,7 +77,33 @@ namespace Db4oEntidades.Testes
         [Test]
         public void Inserir_Varios_para_Listar()
         {
+            Guid idNovoDb = Guid.NewGuid();
+            IRepositorio repositorio = RepositorioDb4O.ObterInstanciaDoRepositorio(idNovoDb);
 
+            try
+            {
+                for (var i = 0; i < 5000; i++)
+                {
+                    var preInscrito = new {NomeDoSegurado = "Nome de número " + i.ToString(CultureInfo.InvariantCulture),};
+                    repositorio.Inserir(Tipo, preInscrito.ToExpando());
+                }
+
+                //Recuperar os registros
+                var todosRegistros = repositorio.Listar(Tipo);
+
+                Assert.AreEqual(5000, todosRegistros.Count);
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                repositorio.Dispose();
+                System.IO.File.Delete(idNovoDb.ToString() + ".yap");
+            }
+            
         }
 
     }
