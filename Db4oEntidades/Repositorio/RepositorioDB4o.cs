@@ -13,8 +13,17 @@ namespace Db4oEntidades.Repositorio
     /// <summary>
     /// Repositório específico para trabalhar com o DB4o
     /// </summary>
-    class RepositorioDb4O : IRepositorio, IDisposable
+    class RepositorioDb4O : IRepositorio
     {
+        /// <summary>
+        /// Construtor recebendo o IdConvenio para trabalhar
+        /// </summary>
+        /// <param name="idConvenio"></param>
+        public RepositorioDb4O(Guid idConvenio)
+        {
+            this._idConvenio = idConvenio;
+        }
+
         #region IRepositorio
 
         /// <summary>
@@ -44,7 +53,7 @@ namespace Db4oEntidades.Repositorio
         /// <param name="entidade">Nome da entidade no Domínio</param>
         /// <param name="conteudo">ExpandoObject com os dados da nova Entidade</param>
         /// <returns>ExpandoObject com os dados inseridos e um Id gerado para essa Entidade</returns>
-        public object Inserir(string entidade, ExpandoObject conteudo)
+        public ExpandoObject Inserir(string entidade, ExpandoObject conteudo)
         {
             //TODO: Pensar numa maneira de Pedir ao Domínio para validar a Entidade
             var instanciaDoTipoParaFazerMapeamento = ObterAnonimoDe(entidade);
@@ -85,6 +94,8 @@ namespace Db4oEntidades.Repositorio
 
         #region Implementação Específica do DB4o
 
+        private Guid _idConvenio;
+
         /// <summary>
         /// Dada uma String descrevendo o FullName de um tipo qualquer retorna uma instância anônima que representa o mesmo
         /// </summary>
@@ -107,7 +118,7 @@ namespace Db4oEntidades.Repositorio
         /// <returns>O tipo anônimo preenchido</returns>
         private object CopiarEstadoDeObjeto(ExpandoObject origem, object destino)
         {
-            IDictionary<string, Object> expando = origem;
+            IDictionary<string, object> expando = origem;
 
             foreach (var propriedade in destino.GetType().GetProperties())
             {
@@ -132,17 +143,16 @@ namespace Db4oEntidades.Repositorio
         }
 
         /// <summary>
-        /// Instância única do Repositório
-        /// </summary>
-        private static IRepositorio _repoInstance;
-
-        /// <summary>
         /// Arquivo de dados desse Repositório
         /// </summary>
         /// <remarks>
-        /// TODO: Pensar em padrão para forçar passar o idConvenio para obter o repositorio concreto
         /// </remarks>
-        public const string Dbname = "IdConvenio.dat";
+        public const string Dbname = "{0}.dat";
+
+        /// <summary>
+        /// Instância única do Repositório
+        /// </summary>
+        private static IRepositorio _repoInstance;
 
         /// <summary>
         /// Container de objetos do DB4o
@@ -150,13 +160,18 @@ namespace Db4oEntidades.Repositorio
         IObjectContainer _context = null;
 
         /// <summary>
-        /// Instância do Respositório para uso
+        /// Instância do Respositório para uso. SingleTon no caso do db4o
         /// </summary>
-        /// <returns></returns>
-        public static IRepositorio GetRepositoryInstance()
+        /// <returns>
+        /// Instância do Repositório
+        /// </returns>
+        /// <remarks>
+        /// TODO: Isso aqui deveria ficar fora dessa classe. Pensar num serviço de domínio que sabe recuperar Repositórios Concretos
+        /// </remarks>
+        public static IRepositorio ObterInstanciaDoRepositorio(Guid idConvenio)
         {
             if (_repoInstance == null)
-                _repoInstance = new RepositorioDb4O();
+                _repoInstance = new RepositorioDb4O(idConvenio);
 
             return _repoInstance;
         }
@@ -169,7 +184,7 @@ namespace Db4oEntidades.Repositorio
             get
             {
                 if (_context == null)
-                    _context = Db4oFactory.OpenFile(Dbname);
+                    _context = Db4oFactory.OpenFile(string.Format(Dbname, this._idConvenio));
 
                 return _context;
             }
