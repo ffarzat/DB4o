@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,7 +15,6 @@ namespace Db4oEntidades.Repositorio
     /// </summary>
     class RepositorioDb4O : IRepositorio, IDisposable
     {
-
         #region IRepositorio
 
         /// <summary>
@@ -44,9 +44,19 @@ namespace Db4oEntidades.Repositorio
         /// <param name="entidade">Nome da entidade no Domínio</param>
         /// <param name="conteudo">ExpandoObject com os dados da nova Entidade</param>
         /// <returns>ExpandoObject com os dados inseridos e um Id gerado para essa Entidade</returns>
-        public ExpandoObject Inserir(string entidade, ExpandoObject conteudo)
+        public object Inserir(string entidade, ExpandoObject conteudo)
         {
-            throw new NotImplementedException();
+            //TODO: Pensar numa maneira de Pedir ao Domínio para validar a Entidade
+            var instanciaDoTipoParaFazerMapeamento = ObterAnonimoDe(entidade);
+
+            //Transformar no tipo com o intuito de validar se o objeto é da estrutura certa
+            var novo = CopiarEstadoDeObjeto(conteudo, instanciaDoTipoParaFazerMapeamento);
+            
+            //Testar se a Entidade está válida para ser adicionada ao repositório
+
+            //Salvar
+            this.Context.Store(novo);
+            return conteudo;
         }
 
         /// <summary>
@@ -74,6 +84,52 @@ namespace Db4oEntidades.Repositorio
         #endregion
 
         #region Implementação Específica do DB4o
+
+        /// <summary>
+        /// Dada uma String descrevendo o FullName de um tipo qualquer retorna uma instância anônima que representa o mesmo
+        /// </summary>
+        /// <param name="tipo">FullName do Tipo</param>
+        /// <returns>Instância anônima que representa o Tipo</returns>
+        private object ObterAnonimoDe(string tipo)
+        {
+            //TODO: Colocar DBC da Vital.Infra
+            if (tipo == null) throw new ArgumentNullException("tipo");
+
+            Type tipoParaAnonimo = Assembly.GetExecutingAssembly().GetType(tipo);
+            return Activator.CreateInstance(tipoParaAnonimo);
+        }
+
+        /// <summary>
+        /// Copia o estado armazendo em um ExpandoObject para um tipo anônimo de destino
+        /// </summary>
+        /// <param name="origem">Dados do objeto</param>
+        /// <param name="destino">Tipo anônimo representando o Objeto</param>
+        /// <returns>O tipo anônimo preenchido</returns>
+        private object CopiarEstadoDeObjeto(ExpandoObject origem, object destino)
+        {
+            IDictionary<string, Object> expando = origem;
+
+            foreach (var propriedade in destino.GetType().GetProperties())
+            {
+                var lower = propriedade.Name.ToLower();
+                var key = expando.Keys.SingleOrDefault(k => k.ToLower() == lower);
+
+                if (key != null)
+                {
+                    switch (propriedade.PropertyType.Name)
+                    {
+                        case "Guid":
+                            propriedade.SetValue(destino, Guid.Parse(expando[key].ToString()), null);
+                            break;
+                        default:
+                            propriedade.SetValue(destino, expando[key], null);
+                            break;
+                    }
+                }
+            }
+
+            return destino;
+        }
 
         /// <summary>
         /// Instância única do Repositório

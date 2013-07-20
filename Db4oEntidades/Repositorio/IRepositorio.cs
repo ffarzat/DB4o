@@ -35,8 +35,8 @@ namespace Db4oEntidades.Repositorio
         /// </summary>
         /// <param name="entidade">Nome da entidade no Domínio</param>
         /// <param name="conteudo">ExpandoObject com os dados da nova Entidade</param>
-        /// <returns>ExpandoObject com os dados inseridos e um Id gerado para essa Entidade</returns>
-        ExpandoObject Inserir(string entidade, ExpandoObject conteudo);
+        /// <returns>Anônimo com os dados inseridos e um Id gerado para essa Entidade</returns>
+        Object Inserir(string entidade, ExpandoObject conteudo);
 
         /// <summary>
         /// Edita os dados de uma Entidade
