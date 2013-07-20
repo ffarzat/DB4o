@@ -19,11 +19,12 @@ namespace Db4oEntidades.Testes
     public class Db4OTestes
     {
         private Guid _idConvenio;
+        private string Tipo = "Db4oEntidades.PreInscrito";
 
         [TestFixtureSetUp]
         public void SetUp()
         {
-            _idConvenio = new Guid();
+            _idConvenio = new Guid(); //Valor defult do guid
         }
 
         [Test]
@@ -37,14 +38,28 @@ namespace Db4oEntidades.Testes
         }
 
         [Test]
-        public void Inserir_Nova_Entidade_Por_String()
+        public void Inserir_Recuperar_Alterar_Excluir_Entidade_Por_String()
         {
             IRepositorio repositorio = RepositorioDb4O.ObterInstanciaDoRepositorio(_idConvenio);
-            var preInscrito = new PreInscrito() {NomeDoSegurado = "Teste Unitário da Silva Sauro"};
-            var preInscritoInserido = repositorio.Inserir("Db4oEntidades.PreInscrito", preInscrito.ToExpando()) as IDictionary<string, Object>; 
+            var preInscrito = new PreInscrito() {NomeDoSegurado = "Teste Unitário da Silva Sauro", };
+            var preInscritoInserido = repositorio.Inserir(Tipo, preInscrito.ToExpando()) as IDictionary<string, Object>; 
 
             Assert.IsNotNull(preInscritoInserido);
             Assert.AreEqual("Teste Unitário da Silva Sauro", preInscritoInserido["NomeDoSegurado"]);
+            Assert.IsNotNull(preInscritoInserido["Id"]);
+
+            Guid idGerado = Guid.Parse(preInscritoInserido["Id"].ToString());
+
+            preInscritoInserido["Bairro"] = "Bairro via teste unitário";
+            var preInscritoAlterado = repositorio.Alterar(Tipo, preInscritoInserido as ExpandoObject) as IDictionary<string, Object>;
+
+            Assert.IsNotNull(preInscritoAlterado);
+            Assert.AreEqual("Teste Unitário da Silva Sauro", preInscritoAlterado["NomeDoSegurado"]);
+            Assert.AreEqual(idGerado, preInscritoAlterado["Id"]);
+            Assert.AreEqual("Bairro via teste unitário", preInscritoAlterado["Bairro"]);
+
+
         }
+
     }
 }

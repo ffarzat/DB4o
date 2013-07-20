@@ -55,6 +55,8 @@ namespace Db4oEntidades.Repositorio
         /// <returns>ExpandoObject com os dados inseridos e um Id gerado para essa Entidade</returns>
         public ExpandoObject Inserir(string entidade, ExpandoObject conteudo)
         {
+            IDictionary<string, Object> dadosdaEntidade = conteudo;
+
             //TODO: Pensar numa maneira de Pedir ao Domínio para validar a Entidade
             var instanciaDoTipoParaFazerMapeamento = ObterAnonimoDe(entidade);
 
@@ -62,9 +64,12 @@ namespace Db4oEntidades.Repositorio
             var novo = CopiarEstadoDeObjeto(conteudo, instanciaDoTipoParaFazerMapeamento);
             
             //Testar se a Entidade está válida para ser adicionada ao repositório
+            //Aqui valida por exemplo se já tem id
+
+            dadosdaEntidade["Id"] = Guid.NewGuid();
 
             //Salvar
-            this.Context.Store(novo);
+            this.Context.Store(dadosdaEntidade);
             return conteudo;
         }
 
@@ -76,7 +81,20 @@ namespace Db4oEntidades.Repositorio
         /// <returns>ExpandoObject com os dados editados</returns>
         public ExpandoObject Alterar(string entidade, ExpandoObject conteudo)
         {
-            throw new NotImplementedException();
+            IDictionary<string, Object> dadosdaEntidade = conteudo;
+
+            //TODO: Pensar numa maneira de Pedir ao Domínio para validar a Entidade
+            var instanciaDoTipoParaFazerMapeamento = ObterAnonimoDe(entidade);
+
+            //Transformar no tipo com o intuito de validar se o objeto é da estrutura certa
+            var novo = CopiarEstadoDeObjeto(conteudo, instanciaDoTipoParaFazerMapeamento);
+
+            //Testar se a Entidade está válida para ser adicionada ao repositório
+            //Aqui valida por exemplo se já tem id
+
+            //Salvar
+            this.Context.Store(dadosdaEntidade);
+            return conteudo;
         }
 
         /// <summary>

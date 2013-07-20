@@ -10,11 +10,11 @@ namespace Db4oEntidades
     /// Interface pública de Entidade no Framework de CRUD e no de Processo
     /// </summary>
     /// <typeparam name="T">Tipo de Id da Entiade (GUID, Int, String)</typeparam>
-    public class IEntidade<T>
+    public class IEntidade
     {
         /// <summary>
         /// Id da Entidade
         /// </summary>
-        T Id { get; set; }
+        Guid Id { get; set; }
     }
 }
