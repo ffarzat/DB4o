@@ -5,13 +5,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Db4objects.Db4o;
+
 namespace Db4oEntidades.Repositorio
 {
     /// <summary>
     /// Repositório específico para trabalhar com o DB4o
     /// </summary>
-    class RepositorioDB4o: IRepositorio
+    class RepositorioDb4O : IRepositorio, IDisposable
     {
+
+        #region IRepositorio
+
         /// <summary>
         /// Obtem uma entidade por Id
         /// </summary>
@@ -65,5 +70,65 @@ namespace Db4oEntidades.Repositorio
         {
             throw new NotImplementedException();
         }
+
+        #endregion
+
+        #region Implementação Específica do DB4o
+
+        /// <summary>
+        /// Instância única do Repositório
+        /// </summary>
+        private static IRepositorio _repoInstance;
+
+        /// <summary>
+        /// Arquivo de dados desse Repositório
+        /// </summary>
+        /// <remarks>
+        /// TODO: Pensar em padrão para forçar passar o idConvenio para obter o repositorio concreto
+        /// </remarks>
+        public const string Dbname = "IdConvenio.dat";
+
+        /// <summary>
+        /// Container de objetos do DB4o
+        /// </summary>
+        IObjectContainer _context = null;
+
+        /// <summary>
+        /// Instância do Respositório para uso
+        /// </summary>
+        /// <returns></returns>
+        public static IRepositorio GetRepositoryInstance()
+        {
+            if (_repoInstance == null)
+                _repoInstance = new RepositorioDb4O();
+
+            return _repoInstance;
+        }
+
+        /// <summary>
+        /// Instância do ObjectContainer para uso
+        /// </summary>
+        private IObjectContainer Context
+        {
+            get
+            {
+                if (_context == null)
+                    _context = Db4oFactory.OpenFile(Dbname);
+
+                return _context;
+            }
+        }
+
+        /// <summary>
+        /// Libera o objeto para o Garbage Collector
+        /// </summary>
+        public void Dispose()
+        {
+            this._context.Close();
+            this._context.Dispose();
+            this._context = null;
+        }
+
+        #endregion
     }
 }
