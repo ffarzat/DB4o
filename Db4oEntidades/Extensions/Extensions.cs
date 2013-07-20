@@ -18,8 +18,8 @@ namespace Db4oEntidades.Extensions
         public static ExpandoObject ToExpando(this object anonymousObject)
         {
             IDictionary<string, object> d = new ExpandoObject();
-            foreach (PropertyInfo property in anonymousObject.GetType().GetProperties())
-                d[property.Name] = property.GetValue(anonymousObject, null);
+            foreach (PropertyInfo property in anonymousObject.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy))
+                d[property.Name] = property.GetValue(anonymousObject);
 
             return d as ExpandoObject;
         }

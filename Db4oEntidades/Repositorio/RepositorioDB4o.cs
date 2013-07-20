@@ -7,6 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Db4objects.Db4o;
+using Db4objects.Db4o.Config;
+using Db4objects.Db4o.Ext;
+using Db4objects.Db4o.Query;
+using Db4oEntidades.Extensions;
+
 
 namespace Db4oEntidades.Repositorio
 {
@@ -34,7 +39,13 @@ namespace Db4oEntidades.Repositorio
         /// <returns>ExpandoObject representando a entidade</returns>
         public ExpandoObject ObterPor(string entidade, Guid id)
         {
-            throw new NotImplementedException();
+            var instanciaDoTipoParaFazerMapeamento = ObterAnonimoDe(entidade);
+
+            ((IEntidade)instanciaDoTipoParaFazerMapeamento).Id = id;
+
+            IObjectSet result = Context.QueryByExample(instanciaDoTipoParaFazerMapeamento);
+
+            return result[0] .ToExpando();
         }
 
         /// <summary>
@@ -66,11 +77,12 @@ namespace Db4oEntidades.Repositorio
             //Testar se a Entidade está válida para ser adicionada ao repositório
             //Aqui valida por exemplo se já tem id
 
-            dadosdaEntidade["Id"] = Guid.NewGuid();
+            ((IEntidade) novo).Id = Guid.NewGuid();
 
             //Salvar
-            this.Context.Store(dadosdaEntidade);
-            return conteudo;
+            this.Context.Store(novo);
+
+            return novo.ToExpando();
         }
 
         /// <summary>
@@ -82,18 +94,8 @@ namespace Db4oEntidades.Repositorio
         public ExpandoObject Alterar(string entidade, ExpandoObject conteudo)
         {
             IDictionary<string, Object> dadosdaEntidade = conteudo;
-
-            //TODO: Pensar numa maneira de Pedir ao Domínio para validar a Entidade
-            var instanciaDoTipoParaFazerMapeamento = ObterAnonimoDe(entidade);
-
-            //Transformar no tipo com o intuito de validar se o objeto é da estrutura certa
-            var novo = CopiarEstadoDeObjeto(conteudo, instanciaDoTipoParaFazerMapeamento);
-
-            //Testar se a Entidade está válida para ser adicionada ao repositório
-            //Aqui valida por exemplo se já tem id
-
-            //Salvar
-            this.Context.Store(dadosdaEntidade);
+            Excluir(entidade, Guid.Parse(dadosdaEntidade["Id"].ToString()));
+            Inserir(entidade, conteudo);
             return conteudo;
         }
 
@@ -105,7 +107,9 @@ namespace Db4oEntidades.Repositorio
         /// <returns>ExpandoObject representando a Entidade Excluída</returns>
         public ExpandoObject Excluir(string entidade, Guid id)
         {
-            throw new NotImplementedException();
+            var entidadeParaExcluir = ObterPor(entidade, id);
+            this.Context.Delete(entidadeParaExcluir);
+            return entidadeParaExcluir;
         }
 
         #endregion
@@ -165,7 +169,7 @@ namespace Db4oEntidades.Repositorio
         /// </summary>
         /// <remarks>
         /// </remarks>
-        public const string Dbname = "{0}.dat";
+        public const string Dbname = "{0}.yap";
 
         /// <summary>
         /// Instância única do Repositório
@@ -202,8 +206,13 @@ namespace Db4oEntidades.Repositorio
             get
             {
                 if (_context == null)
-                    _context = Db4oFactory.OpenFile(string.Format(Dbname, this._idConvenio));
+                {
+                    //Habilitando o uso de UUID
+                    IConfiguration configuration = Db4oFactory.NewConfiguration();
+                    configuration.GenerateUUIDs(ConfigScope.Globally);
 
+                    _context = Db4oFactory.OpenFile(string.Format(Dbname, this._idConvenio));
+                }
                 return _context;
             }
         }

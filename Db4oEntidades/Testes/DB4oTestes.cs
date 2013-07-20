@@ -47,17 +47,35 @@ namespace Db4oEntidades.Testes
             Assert.IsNotNull(preInscritoInserido);
             Assert.AreEqual("Teste Unitário da Silva Sauro", preInscritoInserido["NomeDoSegurado"]);
             Assert.IsNotNull(preInscritoInserido["Id"]);
+        }
+
+        [Test]
+        public void Recuperar_Alterar_Entidade()
+        {
+            //Inserir via anonimo
+            IRepositorio repositorio = RepositorioDb4O.ObterInstanciaDoRepositorio(_idConvenio);
+            var preInscrito = new { NomeDoSegurado = "Teste De inserção apenas para alterar depois", };
+            var preInscritoInserido = repositorio.Inserir(Tipo, preInscrito.ToExpando()) as IDictionary<string, Object>;
+
+            Assert.IsNotNull(preInscritoInserido);
+            Assert.AreEqual("Teste De inserção apenas para alterar depois", preInscritoInserido["NomeDoSegurado"]);
+            Assert.IsNotNull(preInscritoInserido["Id"]);
 
             Guid idGerado = Guid.Parse(preInscritoInserido["Id"].ToString());
 
             preInscritoInserido["Bairro"] = "Bairro via teste unitário";
+            preInscritoInserido["NomeDoSegurado"] = "Nome Alterado";
             var preInscritoAlterado = repositorio.Alterar(Tipo, preInscritoInserido as ExpandoObject) as IDictionary<string, Object>;
 
             Assert.IsNotNull(preInscritoAlterado);
-            Assert.AreEqual("Teste Unitário da Silva Sauro", preInscritoAlterado["NomeDoSegurado"]);
+            Assert.AreEqual("Nome Alterado", preInscritoAlterado["NomeDoSegurado"]);
             Assert.AreEqual(idGerado, preInscritoAlterado["Id"]);
             Assert.AreEqual("Bairro via teste unitário", preInscritoAlterado["Bairro"]);
+        }
 
+        [Test]
+        public void Inserir_Varios_para_Listar()
+        {
 
         }
 
