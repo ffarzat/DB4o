@@ -36,8 +36,13 @@ namespace Db4oEntidades.Extensions
             return (from object o in lista select o.ToExpando()).ToList();
         }
 
-
-        public static string GetReflectedPropertyValue(this object subject, string field)
+        /// <summary>
+        /// Obtem o valor de uma propriedade por reflexao
+        /// </summary>
+        /// <param name="subject"></param>
+        /// <param name="field"></param>
+        /// <returns></returns>
+        public static string ObterValorPropriedade(this object subject, string field)
         {
             object reflectedValue = subject.GetType().GetProperty(field).GetValue(subject, null);
             return reflectedValue != null ? reflectedValue.ToString() : "";

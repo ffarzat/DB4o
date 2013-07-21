@@ -30,7 +30,7 @@ namespace Db4oEntidades.Testes
             IRepositorio repositorio = RepositorioDb4O.ObterInstanciaDoRepositorio(_idConvenio);
             repositorio.Dispose();
 
-           // System.IO.File.Delete(_idConvenio.ToString() + ".yap");
+           System.IO.File.Delete(_idConvenio.ToString() + ".yap");
         }
 
         [Test]
