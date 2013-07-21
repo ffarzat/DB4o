@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -70,20 +71,66 @@ namespace Db4oEntidades.Repositorio
         /// <param name="campoOrdenar">Nome da propriedade do objeto para ordenar</param>
         /// <param name="direcaoOrdenar">Direção da ordenação (ASC ou DESC)</param>
         /// <returns></returns>
-        public ResultadoPaginacao Listar(string entidade, int numeroDaPagina, int numeroDeRegistrosPorPagina, string campoOrdenar, string direcaoOrdenar)
+        public ResultadoConsulta Listar(string entidade, int numeroDaPagina, int numeroDeRegistrosPorPagina, string campoOrdenar, string direcaoOrdenar)
+        {
+            var instanciaDoTipoParaFazerMapeamento = ObterAnonimoDe(entidade);
+            IObjectSet resultadoConsulta = Context.Query(instanciaDoTipoParaFazerMapeamento.GetType());
+            var resultadoPaginado = PaginarResultado(resultadoConsulta, numeroDaPagina, numeroDeRegistrosPorPagina);
+            var resultadoOrdenado = OrdenarResultadoPaginacao(resultadoPaginado, campoOrdenar, direcaoOrdenar);
+
+            int totalDeRegistros = resultadoConsulta.Count;
+            int totalDePaginas = (totalDeRegistros / numeroDeRegistrosPorPagina);
+
+            return new ResultadoConsulta(totalDePaginas, totalDeRegistros, resultadoOrdenado);
+        }
+
+        /// <summary>
+        /// Pagina uma consulta
+        /// </summary>
+        /// <param name="resultadoConsulta">Lista de objetos</param>
+        /// <param name="numeroDaPagina">Página de dados atual</param>
+        /// <param name="numeroDeRegistrosPorPagina">Quantidade de registros por página</param>
+        /// <returns></returns>
+        private IEnumerable<object> PaginarResultado(IObjectSet resultadoConsulta, int numeroDaPagina, int numeroDeRegistrosPorPagina)
+        {
+            return (from object o in resultadoConsulta select o).Skip(numeroDeRegistrosPorPagina * numeroDaPagina).Take(numeroDeRegistrosPorPagina);
+        }
+
+        /// <summary>
+        /// Ordena um IEnumerable<object> pelo campo e direção 
+        /// </summary>
+        /// <param name="resultadoPaginado">IEnumerable<object> com a lista de objetos</param>
+        /// <param name="campoOrdenar">Nome da Propriedade no objeto</param>
+        /// <param name="direcaoOrdenar">"asc" ou "desc"</param>
+        /// <returns>
+        /// Lista ordenada
+        /// </returns>
+        private List<ExpandoObject> OrdenarResultadoPaginacao(IEnumerable<object> resultadoPaginado, string campoOrdenar, string direcaoOrdenar)
+        {
+            return direcaoOrdenar.ToLower().Equals("desc") ? (resultadoPaginado.AsQueryable().OrderByDescending(o => o.ObterValorPropriedade(campoOrdenar))).ToExpandoList() : (resultadoPaginado.AsQueryable().OrderBy(o => o.ObterValorPropriedade(campoOrdenar))).ToExpandoList();
+        }
+
+
+
+
+
+
+        public ResultadoConsulta ListarFiltrando(string entidade, ExpandoObject conteudo, int numeroDaPagina, int numeroDeRegistrosPorPagina, string campoOrdenar, string direcaoOrdenar)
         {
             var instanciaDoTipoParaFazerMapeamento = ObterAnonimoDe(entidade);
             IObjectSet result = Context.Query(instanciaDoTipoParaFazerMapeamento.GetType());
+
+
             int totalDeRegistros = result.Count;
-            int totalDePaginas = (totalDeRegistros/numeroDeRegistrosPorPagina);
+            int totalDePaginas = (totalDeRegistros / numeroDeRegistrosPorPagina);
 
-            var resultadoPaginado =  (from object o in result select o).Skip(numeroDeRegistrosPorPagina*numeroDaPagina).Take(numeroDeRegistrosPorPagina);
+            var resultadoPaginado = (from object o in result select o).Skip(numeroDeRegistrosPorPagina * numeroDaPagina).Take(numeroDeRegistrosPorPagina);
 
-            resultadoPaginado =  direcaoOrdenar.ToLower().Equals("desc")? 
+            resultadoPaginado = direcaoOrdenar.ToLower().Equals("desc") ?
                 resultadoPaginado.AsQueryable().OrderByDescending(o => o.ObterValorPropriedade(campoOrdenar))
-                :resultadoPaginado.AsQueryable().OrderBy(o => o.ObterValorPropriedade(campoOrdenar));
+                : resultadoPaginado.AsQueryable().OrderBy(o => o.ObterValorPropriedade(campoOrdenar));
 
-            return new ResultadoPaginacao(totalDePaginas, totalDeRegistros, resultadoPaginado.ToExpandoList());
+            return new ResultadoConsulta(totalDePaginas, totalDeRegistros, resultadoPaginado.ToExpandoList());
         }
 
         /// <summary>

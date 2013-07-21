@@ -10,7 +10,7 @@ namespace Db4oEntidades
     /// <summary>
     /// Representa o retorno da páginação do CRUD Genérico
     /// </summary>
-    public class ResultadoPaginacao
+    public class ResultadoConsulta
     {
         /// <summary>
         /// Total de Páginas da consulta
@@ -33,7 +33,7 @@ namespace Db4oEntidades
         /// <param name="totalDePaginas">Total de páginas na consulta</param>
         /// <param name="totalDeRegistros">Total de registros da consulta</param>
         /// <param name="listaRegistros">Registros resultado da consulta</param>
-        public ResultadoPaginacao(int totalDePaginas, int totalDeRegistros, List<ExpandoObject> listaRegistros)
+        public ResultadoConsulta(int totalDePaginas, int totalDeRegistros, List<ExpandoObject> listaRegistros)
         {
             TotalDePaginas = totalDePaginas;
             TotalDeRegistros = totalDeRegistros;

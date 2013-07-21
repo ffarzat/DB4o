@@ -37,7 +37,7 @@ namespace Db4oEntidades
         /// <param name="campoOrdenar">Nome da propriedade do objeto para ordenar</param>
         /// <param name="direcaoOrdenar">Direção da ordenação (ASC ou DESC)</param>
         /// <returns></returns>
-        ResultadoPaginacao Listar(string entidade, int numeroDaPagina, int numeroDeRegistrosPorPagina, string campoOrdenar, string direcaoOrdenar);
+        ResultadoConsulta Listar(string entidade, int numeroDaPagina, int numeroDeRegistrosPorPagina, string campoOrdenar, string direcaoOrdenar);
 
         /// <summary>
         /// Adiciona uma nova Entidade ao Repositório
