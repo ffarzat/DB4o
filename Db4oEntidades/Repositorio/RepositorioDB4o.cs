@@ -6,6 +6,8 @@ using System.Reflection;
 using Db4objects.Db4o;
 using Db4objects.Db4o.Config;
 using Db4oEntidades.Extensions;
+using Db4objects.Db4o.Constraints;
+using Db4objects.Db4o.Ext;
 
 
 namespace Db4oEntidades.Repositorio
@@ -39,6 +41,9 @@ namespace Db4oEntidades.Repositorio
             ((IEntidade)instanciaDoTipoParaFazerMapeamento).Id = id;
 
             IObjectSet result = Context.QueryByExample(instanciaDoTipoParaFazerMapeamento);
+
+            if (result.Count == 0)
+                return null;
 
             return result[0] .ToExpando();
         }
@@ -107,8 +112,8 @@ namespace Db4oEntidades.Repositorio
             ((IEntidade) novo).Id = Guid.NewGuid();
 
             //Salvar
-            this.Context.Store(novo);
-
+            Context.Store(novo);
+           
             return novo.ToExpando();
         }
 
@@ -134,9 +139,15 @@ namespace Db4oEntidades.Repositorio
         /// <returns>ExpandoObject representando a Entidade Excluída</returns>
         public ExpandoObject Excluir(string entidade, Guid id)
         {
-            var entidadeParaExcluir = ObterPor(entidade, id);
-            this.Context.Delete(entidadeParaExcluir);
-            return entidadeParaExcluir;
+            var instanciaDoTipoParaFazerMapeamento = ObterAnonimoDe(entidade);
+            ((IEntidade)instanciaDoTipoParaFazerMapeamento).Id = id;
+            IObjectSet result = Context.QueryByExample(instanciaDoTipoParaFazerMapeamento);
+
+            var excluidoRetorno = CopiarEstadoDeObjeto(result[0].ToExpando(), instanciaDoTipoParaFazerMapeamento);
+
+            Context.Delete(result[0]);
+
+            return excluidoRetorno.ToExpando();
         }
 
         #endregion

@@ -20,7 +20,8 @@ namespace Db4oEntidades.Testes
         [TestFixtureSetUp]
         public void SetUp()
         {
-            _idConvenio = new Guid(); //Valor defult do guid
+            _idConvenio = Guid.NewGuid();
+            RepositorioDb4O.ObterInstanciaDoRepositorio(_idConvenio);
         }
 
         [TestFixtureTearDown]
@@ -29,7 +30,7 @@ namespace Db4oEntidades.Testes
             IRepositorio repositorio = RepositorioDb4O.ObterInstanciaDoRepositorio(_idConvenio);
             repositorio.Dispose();
 
-            System.IO.File.Delete(_idConvenio.ToString() + ".yap");
+           // System.IO.File.Delete(_idConvenio.ToString() + ".yap");
         }
 
         [Test]
@@ -43,7 +44,7 @@ namespace Db4oEntidades.Testes
         }
 
         [Test]
-        public void Inserir_Recuperar_Alterar_Excluir_Entidade_Por_String()
+        public void Inserir_Excluir_Entidade_Por_String()
         {
             IRepositorio repositorio = RepositorioDb4O.ObterInstanciaDoRepositorio(_idConvenio);
             var preInscrito = new PreInscrito() {NomeDoSegurado = "Teste Unitário da Silva Sauro", };
@@ -54,6 +55,9 @@ namespace Db4oEntidades.Testes
             Assert.IsNotNull(preInscritoInserido["Id"]);
 
             repositorio.Excluir(Tipo, Guid.Parse(preInscritoInserido["Id"].ToString()));
+
+           var preInscritoExcluido = repositorio.ObterPor(Tipo, Guid.Parse(preInscritoInserido["Id"].ToString()));
+           Assert.IsNull(preInscritoExcluido);
         }
 
         [Test]
