@@ -35,5 +35,12 @@ namespace Db4oEntidades.Extensions
         {
             return (from object o in lista select o.ToExpando()).ToList();
         }
+
+
+        public static string GetReflectedPropertyValue(this object subject, string field)
+        {
+            object reflectedValue = subject.GetType().GetProperty(field).GetValue(subject, null);
+            return reflectedValue != null ? reflectedValue.ToString() : "";
+        }
     }
 }

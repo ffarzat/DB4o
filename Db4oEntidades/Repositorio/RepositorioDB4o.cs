@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -73,10 +72,17 @@ namespace Db4oEntidades.Repositorio
             int totalDeRegistros = result.Count;
             int totalDePaginas = (totalDeRegistros/numeroDeRegistrosPorPagina);
 
-            var resultadoPaginado = (from object o in result select o).Skip(numeroDeRegistrosPorPagina * numeroDaPagina).Take(numeroDeRegistrosPorPagina);
+            //TODO: Refatorar
+            var resultadoPaginado = direcaoOrdenar.ToLower().Equals("desc")? 
+                (from object o in result select o).Skip(numeroDeRegistrosPorPagina*numeroDaPagina)
+                                                  .Take(numeroDeRegistrosPorPagina)
+                                                  .OrderByDescending(o => o.GetReflectedPropertyValue(campoOrdenar))
+                                                  :
+                                                  (from object o in result select o).Skip(numeroDeRegistrosPorPagina * numeroDaPagina)
+                                                  .Take(numeroDeRegistrosPorPagina)
+                                                  .OrderBy(o => o.GetReflectedPropertyValue(campoOrdenar));
 
             return new ResultadoPaginacao(totalDePaginas, totalDeRegistros, resultadoPaginado.ToExpandoList());
-            
         }
 
         /// <summary>
@@ -243,9 +249,9 @@ namespace Db4oEntidades.Repositorio
         /// </summary>
         public void Dispose()
         {
-            this._context.Close();
-            this._context.Dispose();
-            this._context = null;
+            _context.Close();
+            _context.Dispose();
+            _context = null;
         }
 
         #endregion

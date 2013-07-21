@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Dynamic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Db4oEntidades.Repositorio;
 using NUnit.Framework;
 using Db4oEntidades.Extensions;
@@ -57,6 +52,8 @@ namespace Db4oEntidades.Testes
             Assert.IsNotNull(preInscritoInserido);
             Assert.AreEqual("Teste Unitário da Silva Sauro", preInscritoInserido["NomeDoSegurado"]);
             Assert.IsNotNull(preInscritoInserido["Id"]);
+
+            repositorio.Excluir(Tipo, Guid.Parse(preInscritoInserido["Id"].ToString()));
         }
 
         [Test]
@@ -84,40 +81,31 @@ namespace Db4oEntidades.Testes
         }
 
         [Test]
-        public void Inserir_Varios_para_Listar()
+        public void Inserir_Varios_para_Listar_Paginar_Ordenar()
         {
             Guid idNovoDb = Guid.NewGuid();
             IRepositorio repositorio = RepositorioDb4O.ObterInstanciaDoRepositorio(idNovoDb);
 
-            try
+            for (var i = 0; i < 5050; i++)
             {
-                for (var i = 1; i < 5050; i++)
-                {
-                    var preInscrito = new {NomeDoSegurado = "Nome de número " + i.ToString()};
-                    repositorio.Inserir(Tipo, preInscrito.ToExpando());
-                }
-
-                //Recuperar os registros
-                var todosRegistros = repositorio.Listar(Tipo);
-
-                Assert.GreaterOrEqual(todosRegistros.Count, 5000);
-                Assert.AreEqual((todosRegistros[978] as IDictionary<string, Object>)["NomeDoSegurado"], "Nome de número 979");
-
-                //Paginar o resultado
-
-                var registrosPaginados = repositorio.Listar(Tipo, 1, 10, "NomeDoSegurado", "desc");
-
-
+                var preInscrito = new PreInscrito() {NomeDoSegurado = i.ToString() + " Nome", Numero = i.ToString()};
+                repositorio.Inserir(Tipo, preInscrito.ToExpando());
             }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                repositorio.Dispose();
-                System.IO.File.Delete(idNovoDb.ToString() + ".yap");
-            }
+
+            //Recuperar os registros
+            var todosRegistros = repositorio.Listar(Tipo);
+
+            Assert.GreaterOrEqual(todosRegistros.Count, 5000);
+            Assert.AreEqual((todosRegistros[978] as IDictionary<string, Object>)["NomeDoSegurado"], "978 Nome");
+
+            //Paginar o resultado
+
+            var registrosPaginados = repositorio.Listar(Tipo, 1, 10, "Numero", "desc");
+
+            Assert.AreEqual(registrosPaginados.TotalDePaginas, 505);
+            Assert.AreEqual(registrosPaginados.TotalDeRegistros, 5050);
+            Assert.AreEqual((registrosPaginados.ListaRegistros[0] as IDictionary<string, Object>)["Numero"], "19");
+
             
         }
 
