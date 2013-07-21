@@ -4,8 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 
-
-namespace Db4oEntidades.Extensions
+namespace Vital.Core.Extensions
 {
     /// <summary>
     /// Extensão para tratamentos de IRepositorio

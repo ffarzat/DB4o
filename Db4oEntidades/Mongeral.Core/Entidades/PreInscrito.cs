@@ -1,6 +1,7 @@
 ﻿using System;
+using Vital.Core;
 
-namespace Db4oEntidades
+namespace Mongeral.Core.Entidades
 {
 	[Serializable]
 	public class PreInscrito : IEntidade

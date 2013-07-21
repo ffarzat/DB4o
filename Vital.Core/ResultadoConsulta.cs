@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace Db4oEntidades
+namespace Vital.Core
 {
     /// <summary>
     /// Representa o retorno da páginação do CRUD Genérico
@@ -25,7 +20,7 @@ namespace Db4oEntidades
         /// <summary>
         /// Registros resultados da consulta
         /// </summary>
-        public List<ExpandoObject> ListaRegistros { get; private set; }
+        public List<IEntidade> ListaRegistros { get; private set; }
 
         /// <summary>
         /// Cria um objeto de paginação com o resultado calcula de uma consulta
@@ -33,7 +28,7 @@ namespace Db4oEntidades
         /// <param name="totalDePaginas">Total de páginas na consulta</param>
         /// <param name="totalDeRegistros">Total de registros da consulta</param>
         /// <param name="listaRegistros">Registros resultado da consulta</param>
-        public ResultadoConsulta(int totalDePaginas, int totalDeRegistros, List<ExpandoObject> listaRegistros)
+        public ResultadoConsulta(int totalDePaginas, int totalDeRegistros, List<IEntidade> listaRegistros)
         {
             TotalDePaginas = totalDePaginas;
             TotalDeRegistros = totalDeRegistros;
