@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
-using Db4objects.Db4o;
+
 
 namespace Db4oEntidades.Extensions
 {
