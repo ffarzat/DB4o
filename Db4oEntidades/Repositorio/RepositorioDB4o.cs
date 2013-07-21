@@ -77,12 +77,11 @@ namespace Db4oEntidades.Repositorio
             int totalDeRegistros = result.Count;
             int totalDePaginas = (totalDeRegistros/numeroDeRegistrosPorPagina);
 
-            //TODO: Refatorar
-            var resultadoPaginado =  (from object o in result select o).Skip(numeroDeRegistrosPorPagina*numeroDaPagina)
-                                                  .Take(numeroDeRegistrosPorPagina);
-            resultadoPaginado =  direcaoOrdenar.ToLower().Equals("desc")? resultadoPaginado.AsQueryable().OrderByDescending(o => o.ObterValorPropriedade(campoOrdenar))
-                                                                        :
-                                                                        resultadoPaginado.AsQueryable().OrderBy(o => o.ObterValorPropriedade(campoOrdenar));
+            var resultadoPaginado =  (from object o in result select o).Skip(numeroDeRegistrosPorPagina*numeroDaPagina).Take(numeroDeRegistrosPorPagina);
+
+            resultadoPaginado =  direcaoOrdenar.ToLower().Equals("desc")? 
+                resultadoPaginado.AsQueryable().OrderByDescending(o => o.ObterValorPropriedade(campoOrdenar))
+                :resultadoPaginado.AsQueryable().OrderBy(o => o.ObterValorPropriedade(campoOrdenar));
 
             return new ResultadoPaginacao(totalDePaginas, totalDeRegistros, resultadoPaginado.ToExpandoList());
         }
