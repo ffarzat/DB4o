@@ -29,6 +29,17 @@ namespace Db4oEntidades
         List<ExpandoObject> Listar(string entidade);
 
         /// <summary>
+        /// Obtem uma lista de objetos que representam a entidade
+        /// </summary>
+        /// <param name="entidade">Nome da entidade no Domínio</param>
+        /// <param name="numeroDaPagina">Número da página a ser consultada</param>
+        /// <param name="numeroDeRegistrosPorPagina">Quantos registros por página</param>
+        /// <param name="campoOrdenar">Nome da propriedade do objeto para ordenar</param>
+        /// <param name="direcaoOrdenar">Direção da ordenação (ASC ou DESC)</param>
+        /// <returns></returns>
+        ResultadoPaginacao Listar(string entidade, int numeroDaPagina, int numeroDeRegistrosPorPagina, string campoOrdenar, string direcaoOrdenar);
+
+        /// <summary>
         /// Adiciona uma nova Entidade ao Repositório
         /// </summary>
         /// <param name="entidade">Nome da entidade no Domínio</param>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -54,6 +55,28 @@ namespace Db4oEntidades.Repositorio
             IObjectSet result = Context.Query(instanciaDoTipoParaFazerMapeamento.GetType());
 
             return result.ToExpandoList();
+        }
+
+        /// <summary>
+        /// Obtem uma lista de objetos que representam a entidade
+        /// </summary>
+        /// <param name="entidade">Nome da entidade no Domínio</param>
+        /// <param name="numeroDaPagina">Número da página a ser consultada</param>
+        /// <param name="numeroDeRegistrosPorPagina">Quantos registros por página</param>
+        /// <param name="campoOrdenar">Nome da propriedade do objeto para ordenar</param>
+        /// <param name="direcaoOrdenar">Direção da ordenação (ASC ou DESC)</param>
+        /// <returns></returns>
+        public ResultadoPaginacao Listar(string entidade, int numeroDaPagina, int numeroDeRegistrosPorPagina, string campoOrdenar, string direcaoOrdenar)
+        {
+            var instanciaDoTipoParaFazerMapeamento = ObterAnonimoDe(entidade);
+            IObjectSet result = Context.Query(instanciaDoTipoParaFazerMapeamento.GetType());
+            int totalDeRegistros = result.Count;
+            int totalDePaginas = (totalDeRegistros/numeroDeRegistrosPorPagina);
+
+            var resultadoPaginado = (from object o in result select o).Skip(numeroDeRegistrosPorPagina * numeroDaPagina).Take(numeroDeRegistrosPorPagina);
+
+            return new ResultadoPaginacao(totalDePaginas, totalDeRegistros, resultadoPaginado.ToExpandoList());
+            
         }
 
         /// <summary>

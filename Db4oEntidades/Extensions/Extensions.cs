@@ -27,11 +27,11 @@ namespace Db4oEntidades.Extensions
         }
 
         /// <summary>
-        /// Copia o estado de uma lista de objetos para uma lista de ExpandoObject
+        /// Copia o estado de uma lista IObjectSet para uma lista de ExpandoObject
         /// </summary>
         /// <param name="lista">Lista Origem</param>
         /// <returns>Lista de ExpandoObject</returns>
-        public static List<ExpandoObject> ToExpandoList(this IObjectSet lista)
+        public static List<ExpandoObject> ToExpandoList(this IEnumerable lista)
         {
             return (from object o in lista select o.ToExpando()).ToList();
         }

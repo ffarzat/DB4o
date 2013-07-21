@@ -91,7 +91,7 @@ namespace Db4oEntidades.Testes
 
             try
             {
-                for (var i = 1; i < 5000; i++)
+                for (var i = 1; i < 5050; i++)
                 {
                     var preInscrito = new {NomeDoSegurado = "Nome de número " + i.ToString()};
                     repositorio.Inserir(Tipo, preInscrito.ToExpando());
@@ -101,7 +101,12 @@ namespace Db4oEntidades.Testes
                 var todosRegistros = repositorio.Listar(Tipo);
 
                 Assert.GreaterOrEqual(todosRegistros.Count, 5000);
-                Assert.AreEqual((todosRegistros[978] as IDictionary<string, Object>)["NomeDoSegurado"], "Nome de número 978");
+                Assert.AreEqual((todosRegistros[978] as IDictionary<string, Object>)["NomeDoSegurado"], "Nome de número 979");
+
+                //Paginar o resultado
+
+                var registrosPaginados = repositorio.Listar(Tipo, 1, 10, "NomeDoSegurado", "desc");
+
 
             }
             catch (Exception)
