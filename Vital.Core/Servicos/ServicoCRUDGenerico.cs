@@ -167,9 +167,9 @@ namespace Vital.Core.Servicos
         /// Apaga uma Entidade do Repositório
         /// </summary>
         /// <param name="entidade">Instância da Entidade</param>
-        public void Excluir(IEntidade entidade)
+        public void Excluir(object entidade)
         {
-            throw new NotImplementedException();
+            _repoInstance.Excluir(entidade as IEntidade);
         }
 
         /// <summary>

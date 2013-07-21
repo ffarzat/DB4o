@@ -30,8 +30,11 @@ namespace Vital.Core
 
         void Alterar(IEntidade entidade);
 
-
-        void Excluir(IEntidade entidade);
+        /// <summary>
+        /// Apaga uma Entidade do Repositório
+        /// </summary>
+        /// <param name="entidade">Instância da Entidade</param>
+        void Excluir(object entidade);
 
 
         void Dispose();

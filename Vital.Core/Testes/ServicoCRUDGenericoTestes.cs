@@ -42,7 +42,7 @@ namespace Vital.Core.Testes
             Assert.IsNotNull(preInscritoInserido);
             Assert.IsNotNull(preInscritoInserido.Id);
 
-            //repositorio.Excluir(Tipo, Guid.Parse(preInscritoInserido["Id"].ToString()));
+            _servico.Excluir(preInscritoInserido);
 
             //var preInscritoExcluido = repositorio.Obter(Tipo, Guid.Parse(preInscritoInserido["Id"].ToString()));
             //Assert.IsNull(preInscritoExcluido);
