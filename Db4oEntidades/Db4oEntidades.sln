@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepositorioDb4o", "Reposito
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vital.Core", "..\Vital.Core\Vital.Core.csproj", "{AFD5AEA9-502F-403C-8083-9DBAE247C536}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mongeral.Core", "Mongeral.Core\Mongeral.Core.csproj", "{6892A20D-E47A-4B4B-AC8F-7EAA427C3C06}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mongeral.Core", "..\Mongeral.Core\Mongeral.Core.csproj", "{6892A20D-E47A-4B4B-AC8F-7EAA427C3C06}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

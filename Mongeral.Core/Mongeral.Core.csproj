@@ -44,7 +44,7 @@
     <Compile Include="Servicos\ServicoDeEntidades.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Vital.Core\Vital.Core.csproj">
+    <ProjectReference Include="..\Vital.Core\Vital.Core.csproj">
       <Project>{afd5aea9-502f-403c-8083-9dbae247c536}</Project>
       <Name>Vital.Core</Name>
     </ProjectReference>
