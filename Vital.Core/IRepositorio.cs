@@ -70,6 +70,7 @@ namespace Vital.Core
         /// </summary>
         void Dispose();
 
+        //TODO: Implementar
         #region Para implementar
         //void Commit();
 

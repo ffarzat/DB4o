@@ -128,6 +128,7 @@ namespace Vital.Core.Servicos
         public IEntidade Inserir(string tipo, object entidade)
         {
             IEntidade entidadeParaIncluir =_servicoConcreto.ObterAnonimoDe(tipo);
+            //TODO: Aqui deveria passar o Tipo também para o serviço específico validar a entidade por exemplo
             _servicoConcreto.CopiarEstadoDeObjeto(entidade.ToExpando(), entidadeParaIncluir);
             return _repoInstance.Inserir(entidadeParaIncluir);
         }
@@ -140,8 +141,9 @@ namespace Vital.Core.Servicos
         public void Alterar(string tipo, object entidade)
         {
             IEntidade entidadeParaIncluir = _servicoConcreto.ObterAnonimoDe(tipo);
+            //TODO: Aqui deveria passar o Tipo também para o serviço específico validar a entidade por exemplo
             _servicoConcreto.CopiarEstadoDeObjeto(entidade.ToExpando(), entidadeParaIncluir);
-            _repoInstance.Alterar(entidadeParaIncluir as IEntidade);
+            _repoInstance.Alterar(entidadeParaIncluir);
         }
 
         /// <summary>
@@ -153,6 +155,7 @@ namespace Vital.Core.Servicos
         {
             IEntidade entidadeParaExcluir = _servicoConcreto.ObterAnonimoDe(tipo);
             entidadeParaExcluir.Id = (entidade as IEntidade).Id;
+            //TODO: Aqui deveria executar a validação de exclusão do Tipo usando o serviço concreto ANTES de mandar excluir
             _repoInstance.Excluir(entidadeParaExcluir);
         }
 

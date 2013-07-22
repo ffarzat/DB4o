@@ -29,5 +29,11 @@ namespace Vital.Core
         /// <param name="destino">Tipo anônimo representando o Objeto</param>
         /// <returns>O tipo anônimo preenchido</returns>
         IEntidade CopiarEstadoDeObjeto(ExpandoObject origem, object destino);
+
+        //TODO: Implementar
+        // validar Estado da Entidade
+        // validar inserção
+        // validar alteração
+        // validar exclusão
     }
 }
