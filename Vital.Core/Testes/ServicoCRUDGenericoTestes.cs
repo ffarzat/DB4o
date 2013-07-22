@@ -80,7 +80,7 @@ namespace Vital.Core.Testes
             //Recuperar os registros
             var todosRegistros = _servico.Listar(Tipo);
 
-            Assert.GreaterOrEqual(todosRegistros.Count, 5000);
+            Assert.AreEqual(todosRegistros.Count, 5050);
             Assert.AreEqual(todosRegistros[978].ObterValorPropriedade("NomeDoSegurado"), "978 Nome");
 
             //Paginar o resultado

@@ -22,7 +22,7 @@ namespace Db4oEntidades
         public void TearDown()
         {
             _repo.Dispose();
-            //System.IO.File.Delete(_idConvenio.ToString() + ".yap");
+            System.IO.File.Delete(_idConvenio.ToString() + ".yap");
         }
 
         [Test]

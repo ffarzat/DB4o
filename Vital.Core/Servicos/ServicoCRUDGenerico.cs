@@ -87,6 +87,7 @@ namespace Vital.Core.Servicos
         public IEntidade Obter(string entidade, object conteudo)
         {
             IEntidade entidadeParaConsultar = _servicoConcreto.ObterAnonimoDe(entidade);
+            entidadeParaConsultar.Id = (conteudo as IEntidade).Id;
             return _repoInstance.Obter(entidadeParaConsultar);
         }
 
