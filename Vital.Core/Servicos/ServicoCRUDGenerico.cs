@@ -16,6 +16,8 @@ namespace Vital.Core.Servicos
     /// </remarks>
     public class ServicoCrudGenerico : IServicoCrud
     {
+
+        #region IServicoCrud
         /// <summary>
         /// Serviço específico do domínimo configurado
         /// </summary>
@@ -34,35 +36,6 @@ namespace Vital.Core.Servicos
             //TODO: Colocar um Ioc que nos facilite a configuração, pode ser o mesmo esquema do Gerenciador de Assemblies do Framework de Processos
             _servicoConcreto = resolverServicoConcreto();
             _repoInstance = ObterInstanciaDoRepositorio(IdConvenio);
-        }
-
-        /// <summary>
-        /// Dada uma string com o nome do Tipo retorna uma instância do mesmo
-        /// </summary>
-        /// <param name="tipo">String com o Nome do Tipo. Ex.: PreInscrito</param>
-        /// <returns>
-        /// Instância vazia do Tipo
-        /// </returns>
-        public IEntidade ObterAnonimoDe(string tipo)
-        {
-            //TODO: Colocar DBC da Vital.Infra
-            if (tipo == null) throw new ArgumentNullException("tipo");
-            return _servicoConcreto.ObterAnonimoDe(tipo);
-        }
-
-        /// <summary>
-        /// Copia o estado armazendo em um ExpandoObject para um tipo anônimo de destino
-        /// </summary>
-        /// <param name="origem">Dados do objeto</param>
-        /// <param name="destino">Tipo anônimo representando o Objeto</param>
-        /// <returns>O tipo anônimo preenchido</returns>
-        public object CopiarEstadoDeObjeto(ExpandoObject origem, object destino)
-        {
-            //TODO: Colocar DBC da Vital.Infra
-            if (origem == null) throw new ArgumentNullException("origem");
-            if (destino == null) throw new ArgumentNullException("destino");
-
-            return _servicoConcreto.CopiarEstadoDeObjeto(origem, destino);
         }
 
         /// <summary>
@@ -97,56 +70,60 @@ namespace Vital.Core.Servicos
         /// <returns>
         /// Instância do Repositório
         /// </returns>
-        /// <remarks>
-        /// TODO: Isso aqui deveria ficar fora dessa classe. Pensar num serviço de domínio que sabe recuperar Repositórios Concretos
-        /// </remarks>
         public static IRepositorio ObterInstanciaDoRepositorio(Guid idConvenio)
         {
             return _repoInstance ?? (_repoInstance = resolverRepositorioConcreto(idConvenio));
         }
+#endregion
 
         #region IRepositorio
+
         /// <summary>
-        /// Obtem a instância da Entidade por suas propriedades
+        /// Obtem uma entidade dado os valores de propriedades de uma instância de exemplo
         /// </summary>
-        /// <param name="entidade">Instância representa o tipo da Entidade com as propriedades preenchidas</param>
+        /// <param name="entidade">Nome do Tipo da Entidade</param>
+        /// <param name="conteudo">Instância com os valores da consulta</param>
+        /// <returns></returns>
+        public IEntidade Obter(string entidade, object conteudo)
+        {
+            IEntidade entidadeParaConsultar = _servicoConcreto.ObterAnonimoDe(entidade);
+            return _repoInstance.Obter(entidadeParaConsultar);
+        }
+
+        /// <summary>
+        /// Obtem uma lista do Tipo informado
+        /// </summary>
+        /// <param name="entidade">Nome do Tipo da Entidade</param>
+        /// <returns></returns>
+        public List<IEntidade> Listar(string entidade)
+        {
+            IEntidade entidadeParaConsultar =_servicoConcreto.ObterAnonimoDe(entidade);
+            return _repoInstance.Listar(entidadeParaConsultar);
+        }
+
+        /// <summary>
+        /// Obtem uma lista do Tipo informado paginando conforme as opções
+        /// </summary>
+        /// <param name="entidade">Nome do Tipo da Entidade</param>
+        /// <param name="numeroDaPagina">Página Atual</param>
+        /// <param name="numeroDeRegistrosPorPagina">Quantidade de Registros por página</param>
+        /// <param name="propriedadeOrdenar">Nome da propriedade da Entidade para realizar ordenação</param>
+        /// <param name="direcaoOrdenar">"ASC" ou "DESC"</param>
+        /// <returns></returns>
+        public ResultadoConsulta Listar(string entidade, int numeroDaPagina, int numeroDeRegistrosPorPagina, string propriedadeOrdenar, string direcaoOrdenar)
+        {
+            IEntidade entidadeParaConsultar = _servicoConcreto.ObterAnonimoDe(entidade);
+            return _repoInstance.Listar(entidadeParaConsultar, numeroDaPagina, numeroDeRegistrosPorPagina, propriedadeOrdenar, direcaoOrdenar);
+        }
+
+        /// <summary>
+        /// Adiciona uma Nova Entidade do Repositório 
+        /// </summary>
+        /// <param name="tipo">Nome do Tipo da Entidade</param>
+        /// <param name="entidade">Instância representando a Entidade</param>
         /// <returns>
-        /// Instância armazenada da Entidade
+        /// A instância com o Id gerado
         /// </returns>
-        public IEntidade Obter(IEntidade entidade)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Obtem uma lista  da Entidade pelo seu Tipo
-        /// </summary>
-        /// <param name="entidade">Instância que representa o tipo da Entidade</param>
-        /// <returns>
-        /// Lista completa de Entidades correspondentes
-        /// </returns>
-        public List<IEntidade> Listar(IEntidade entidade)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Obtem uma lista de objetos que representam a entidade
-        /// </summary>
-        /// <param name="entidade">Instância que representa o tipo da Entidade</param>
-        /// <param name="numeroDaPagina">Número da página a ser consultada</param>
-        /// <param name="numeroDeRegistrosPorPagina">Quantos registros por página</param>
-        /// <param name="propriedadeOrdenar">Nome da propriedade do objeto para ordenar</param>
-        /// <param name="direcaoOrdenar">Direção da ordenação (ASC ou DESC)</param>
-        /// <returns>
-        /// Lista completa de Entidades correspondentes à consulta (paginado e ordenado)
-        /// </returns
-        public ResultadoConsulta Listar(IEntidade entidade, int numeroDaPagina, int numeroDeRegistrosPorPagina, string propriedadeOrdenar, string direcaoOrdenar)
-        {
-            throw new NotImplementedException();
-        }
-
-
         public IEntidade Inserir(string tipo, object entidade)
         {
             IEntidade entidadeParaIncluir =_servicoConcreto.ObterAnonimoDe(tipo);
@@ -157,19 +134,25 @@ namespace Vital.Core.Servicos
         /// <summary>
         /// Edita os dados de uma Entidade
         /// </summary>
+        /// <param name="tipo"></param>
         /// <param name="entidade">Instância da Entidade</param>
-        public void Alterar(IEntidade entidade)
+        public void Alterar(string tipo, object entidade)
         {
-            throw new NotImplementedException();
+            IEntidade entidadeParaIncluir = _servicoConcreto.ObterAnonimoDe(tipo);
+            _servicoConcreto.CopiarEstadoDeObjeto(entidade.ToExpando(), entidadeParaIncluir);
+            _repoInstance.Alterar(entidadeParaIncluir as IEntidade);
         }
 
         /// <summary>
         /// Apaga uma Entidade do Repositório
         /// </summary>
+        /// <param name="tipo"></param>
         /// <param name="entidade">Instância da Entidade</param>
-        public void Excluir(object entidade)
+        public void Excluir(string tipo, object entidade)
         {
-            _repoInstance.Excluir(entidade as IEntidade);
+            IEntidade entidadeParaExcluir = _servicoConcreto.ObterAnonimoDe(tipo);
+            entidadeParaExcluir.Id = (entidade as IEntidade).Id;
+            _repoInstance.Excluir(entidadeParaExcluir);
         }
 
         /// <summary>
@@ -177,7 +160,7 @@ namespace Vital.Core.Servicos
         /// </summary>
         public void Dispose()
         {
-            throw new NotImplementedException();
+            _repoInstance.Dispose();
         }
 
         #endregion

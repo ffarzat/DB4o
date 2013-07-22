@@ -46,5 +46,20 @@ namespace Vital.Core.Extensions
             object reflectedValue = subject.GetType().GetProperty(field).GetValue(subject, null);
             return reflectedValue != null ? reflectedValue.ToString() : "";
         }
+
+        /// <summary>
+        /// Insere o valor na propriedade
+        /// </summary>
+        /// <param name="subject"></param>
+        /// <param name="field"></param>
+        /// <param name="value"></param>
+        public static void InserirValorPropriedade(this object subject, string field, object value)
+        {
+            var prop = subject.GetType().GetProperty(field);
+
+            if (!prop.CanWrite) return;
+            prop.SetValue(subject, value);
+        }
+
     }
 }

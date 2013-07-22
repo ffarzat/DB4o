@@ -4,6 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using Db4objects.Db4o;
 using Db4objects.Db4o.Config;
+using Db4objects.Db4o.Query;
 using Vital.Core;
 using Vital.Core.Extensions;
 
@@ -32,7 +33,11 @@ namespace Db4oEntidades
         /// <returns></returns>
         public IEntidade Obter(IEntidade entidade)
         {
-            return Context.QueryByExample(entidade).Cast<IEntidade>().Single();
+            var query = Context.Query();
+            //query.Constrain(entidade.GetType());
+            query.Descend("Id").Constrain(entidade.Id);
+            var queryResult = query.Execute();
+            return queryResult.Cast<IEntidade>().FirstOrDefault();
         }
         
         /// <summary>
@@ -92,8 +97,9 @@ namespace Db4oEntidades
         /// <param name="entidade">Instância da Entidade</param>
         public void Alterar(IEntidade entidade)
         {
-            Excluir(entidade);
-            Inserir(entidade);
+            var entidadeNoRepositorio = Obter(entidade);
+            entidadeNoRepositorio = entidade;
+            Context.Store(entidadeNoRepositorio);
         }
 
         /// <summary>

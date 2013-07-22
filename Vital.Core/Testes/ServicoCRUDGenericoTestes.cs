@@ -1,10 +1,10 @@
 ﻿using System;
 using NUnit.Framework;
+using Vital.Core.Extensions;
 using Vital.Core.Servicos;
 
 namespace Vital.Core.Testes
 {
-
     /// <summary>
     /// Teste de Infra do Repositório do DB4o
     /// </summary>
@@ -30,72 +30,66 @@ namespace Vital.Core.Testes
            System.IO.File.Delete(_idConvenio.ToString() + ".yap");
         }
 
-
         [Test]
         public void Inserir_Excluir_Entidade_Por_String()
         {
-
-            var preInscrito = new  { NomeDoSegurado = "Teste Unitário da Silva Sauro", };
+            var preInscrito = new  { NomeDoSegurado = "Teste Unitário da Silva Sauro" };
 
             var preInscritoInserido = _servico.Inserir(Tipo, preInscrito);
 
             Assert.IsNotNull(preInscritoInserido);
             Assert.IsNotNull(preInscritoInserido.Id);
 
-            _servico.Excluir(preInscritoInserido);
+            _servico.Excluir(Tipo, preInscritoInserido);
+            IEntidade preInscritoExcluido = null;
 
-            //var preInscritoExcluido = repositorio.Obter(Tipo, Guid.Parse(preInscritoInserido["Id"].ToString()));
-            //Assert.IsNull(preInscritoExcluido);
+            preInscritoExcluido = _servico.Obter(Tipo, preInscritoInserido);
+            Assert.IsNull(preInscritoExcluido);
         }
 
-        //[Test]
-        //public void Recuperar_Alterar_Entidade()
-        //{
-        //    //Inserir via anonimo
-        //    IRepositorio repositorio = RepositorioDb4O.ObterInstanciaDoRepositorio(_idConvenio);
-        //    var preInscrito = new { NomeDoSegurado = "Teste De inserção apenas para alterar depois", };
-        //    var preInscritoInserido = repositorio.Inserir(Tipo, preInscrito.ToExpando()) as IDictionary<string, Object>;
+        [Test]
+        public void Recuperar_Alterar_Entidade()
+        {
+            var preInscrito = new { NomeDoSegurado = "Teste De inserção apenas para alterar depois" };
+            var preInscritoInserido = _servico.Inserir(Tipo, preInscrito);
 
-        //    Assert.IsNotNull(preInscritoInserido);
-        //    Assert.AreEqual("Teste De inserção apenas para alterar depois", preInscritoInserido["NomeDoSegurado"]);
-        //    Assert.IsNotNull(preInscritoInserido["Id"]);
+            Assert.IsNotNull(preInscritoInserido);
+            Assert.AreEqual("Teste De inserção apenas para alterar depois", preInscritoInserido.ObterValorPropriedade("NomeDoSegurado"));
+            Assert.IsNotNull(preInscritoInserido.Id);
 
-        //    Guid idGerado = Guid.Parse(preInscritoInserido["Id"].ToString());
+            Guid idGerado = preInscritoInserido.Id;
 
-        //    preInscritoInserido["Bairro"] = "Bairro via teste unitário";
-        //    preInscritoInserido["NomeDoSegurado"] = "Nome Alterado";
-        //    var preInscritoAlterado = repositorio.Alterar(Tipo, preInscritoInserido as ExpandoObject) as IDictionary<string, Object>;
+            var preInscritoAlterar = new { NomeDoSegurado = "Nome Alterado", Bairro =  "Bairro via teste unitário", Id = idGerado};
+            _servico.Alterar(Tipo, preInscritoAlterar);
 
-        //    Assert.IsNotNull(preInscritoAlterado);
-        //    Assert.AreEqual("Nome Alterado", preInscritoAlterado["NomeDoSegurado"]);
-        //    Assert.AreEqual(idGerado, preInscritoAlterado["Id"]);
-        //    Assert.AreEqual("Bairro via teste unitário", preInscritoAlterado["Bairro"]);
-        //}
+            Assert.IsNotNull(preInscritoAlterar);
+            Assert.AreEqual("Nome Alterado", preInscritoAlterar.NomeDoSegurado);
+            Assert.AreEqual(idGerado, preInscritoAlterar.Id);
+            Assert.AreEqual("Bairro via teste unitário", preInscritoAlterar.Bairro);
+        }
 
-        //[Test]
-        //public void Inserir_Varios_para_Listar_Paginar_Ordenar()
-        //{
-        //    IRepositorio repositorio = RepositorioDb4O.ObterInstanciaDoRepositorio(_idConvenio);
+        [Test]
+        public void Inserir_Varios_para_Listar_Paginar_Ordenar()
+        {
+            for (var i = 0; i < 5050; i++)
+            {
+                var preInscrito = new { NomeDoSegurado = i.ToString() + " Nome", Numero = i.ToString() };
+                _servico.Inserir(Tipo, preInscrito);
+            }
 
-        //    for (var i = 0; i < 5050; i++)
-        //    {
-        //        var preInscrito = new {NomeDoSegurado = i.ToString() + " Nome", Numero = i.ToString()};
-        //        repositorio.Inserir(Tipo, preInscrito.ToExpando());
-        //    }
+            //Recuperar os registros
+            var todosRegistros = _servico.Listar(Tipo);
 
-        //    //Recuperar os registros
-        //    var todosRegistros = repositorio.Listar(Tipo);
+            Assert.GreaterOrEqual(todosRegistros.Count, 5000);
+            Assert.AreEqual(todosRegistros[978].ObterValorPropriedade("NomeDoSegurado"), "978 Nome");
 
-        //    Assert.GreaterOrEqual(todosRegistros.Count, 5000);
-        //    Assert.AreEqual((todosRegistros[978] as IDictionary<string, Object>)["NomeDoSegurado"], "978 Nome");
+            //Paginar o resultado
+            var registrosPaginados = _servico.Listar(Tipo, 1, 10, "Numero", "desc");
 
-        //    //Paginar o resultado
-        //    var registrosPaginados = repositorio.Listar(Tipo, 1, 10, "Numero", "desc");
-
-        //    Assert.AreEqual(registrosPaginados.TotalDePaginas, 505);
-        //    Assert.AreEqual(registrosPaginados.TotalDeRegistros, 5050);
-        //    Assert.AreEqual((registrosPaginados.ListaRegistros[0] as IDictionary<string, Object>)["Numero"], "19");
-        //}
+            Assert.AreEqual(registrosPaginados.TotalDePaginas, 505);
+            Assert.AreEqual(registrosPaginados.TotalDeRegistros, 5050);
+            Assert.AreEqual(registrosPaginados.ListaRegistros[0].ObterValorPropriedade("Numero"), "19");
+        }
 
     }
 }
