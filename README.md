@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/ffarzat/DB4o.png?label=ready&title=Ready)](https://waffle.io/ffarzat/DB4o)
 # DB4o
 Testes de utilização do db4o
 
